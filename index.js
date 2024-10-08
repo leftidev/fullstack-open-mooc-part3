@@ -1,7 +1,11 @@
 const express = require('express')
+const morgan = require('morgan');
 const app = express()
 
 app.use(express.json())
+
+// Configure Morgan to use the 'tiny' configuration
+app.use(morgan('tiny'));
 
 let persons =
 [
