@@ -29,6 +29,12 @@ let persons =
         "name": "Mary Poppendieck", 
         "number": "39-23-6423122"
     }
+    ,
+    { 
+        "id": "1004",
+        "name": "Test testing", 
+        "number": "39-23-6423122"
+    }
 ]
 
 app.get('/', (request, response) => {
@@ -102,7 +108,7 @@ app.post('/api/persons', (request, response) => {
     response.json(person)
 })
 
-const PORT = 3001
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`)
-})
+const PORT = process.env.PORT || 3001
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server is running on http://0.0.0.0:${PORT}`);
+  });
