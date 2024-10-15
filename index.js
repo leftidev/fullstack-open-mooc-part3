@@ -7,13 +7,14 @@ const Person = require('./models/person')
 
 
 
-morgan.token('body', (req) => JSON.stringify(req.body));
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
+
 
 app.use(cors())
 app.use(express.static('dist'))
 
 app.use(express.json())
+morgan.token('body', (req) => JSON.stringify(req.body));
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
 
 app.get('/', (request, response) => {
     response.send('<h1>Hello World!</h1>')
@@ -49,12 +50,20 @@ app.get('/api/persons/:id', (request, response) => {
       response.json(person)
     })
   })
-
+/*
 app.delete('/api/persons/:id', (request, response) => {
     const id = request.params.id
     persons = persons.filter(person => person.id !== id)
   
     response.status(204).end()
+})
+*/
+app.delete('/api/persons/:id', (request, response, next) => {
+  Person.findByIdAndDelete(request.params.id)
+    .then(result => {
+      response.status(204).end()
+    })
+    .catch(error => next(error))
 })
 
 app.post('/api/persons', (request, response) => {
@@ -68,10 +77,10 @@ app.post('/api/persons', (request, response) => {
         return response.status(400).json({ error: 'number missing' })
     }
 
-    const nameExists = persons.some(person => person.name === body.name);
-    if (nameExists) {
-      return response.status(400).json({ error: 'name must be unique' });
-    }
+    //const nameExists = persons.some(person => person.name === body.name);
+    //if (nameExists) {
+    //  return response.status(400).json({ error: 'name must be unique' });
+    //}
   
     const person = new Person({
         name: body.name,
