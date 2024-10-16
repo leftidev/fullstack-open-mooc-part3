@@ -62,6 +62,7 @@ app.delete('/api/persons/:id', (request, response, next) => {
 app.post('/api/persons', (request, response, next) => {
   const body = request.body
 
+  /*
   if (!body.name || body.name.trim() === '') {
     const error = new Error('name missing');
     error.status = 400;
@@ -73,7 +74,7 @@ app.post('/api/persons', (request, response, next) => {
     error.status = 400;
     return next(error);
   }
-
+  */
   //const nameExists = persons.some(person => person.name === body.name);
   //if (nameExists) {
   //  return response.status(400).json({ error: 'name must be unique' });
@@ -98,7 +99,12 @@ app.put('/api/persons/:id', (request, response, next) => {
       number: body.number,
     }
 
-  Person.findByIdAndUpdate(request.params.id, person, { new: true })
+  Person.findByIdAndUpdate(
+    request.params.id, 
+
+    person,
+    { new: true, runValidators: true, context: 'query' }
+  )
     .then(updatedPerson => {
       response.json(updatedPerson )
     })

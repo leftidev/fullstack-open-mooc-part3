@@ -1,7 +1,7 @@
-PUT http://localhost:3000/api/notes/670e6d3edf9caea8ab4b3f2e
+PUT http://localhost:3001/api/persons/6708e21cd3d9799ce9cba06f
 Content-Type: application/json
 
 {
-  "content": "This is a new note with updated content xd",
-  "important": true
+  "name": "xd",
+  "number": "300"
 }
