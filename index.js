@@ -20,17 +20,22 @@ app.get('/', (request, response) => {
     response.send('<h1>Hello World!</h1>')
 })
 
-app.get('/api/persons', (request, response) => {
+app.get('/api/persons', (request, response, next) => {
     Person.find({}).then(persons => {
       response.json(persons)
     })
+    .catch(error => next(error));
 })
 
 app.get('/info', (request, response) => {
+  Person.find({}).then(persons => {
     const numberOfPersons = persons.length;
     const currentDate = new Date();
     const responseText = `Phonebook has info for ${numberOfPersons} people<br/><br/>${currentDate}`;
     response.send(responseText);
+  }).catch(error => {
+    next(error); // status 500 failed to fetch persons
+  });
 });
 
 app.get('/api/persons/:id', (request, response, next) => {
@@ -54,30 +59,35 @@ app.delete('/api/persons/:id', (request, response, next) => {
     .catch(error => next(error))
 })
 
-app.post('/api/persons', (request, response) => {
-    const body = request.body
-  
-    if (body.name === undefined) {
-      return response.status(400).json({ error: 'name missing' })
-    }
+app.post('/api/persons', (request, response, next) => {
+  const body = request.body
 
-    if (body.number === undefined) {
-        return response.status(400).json({ error: 'number missing' })
-    }
+  if (!body.name || body.name.trim() === '') {
+    const error = new Error('name missing');
+    error.status = 400;
+    return next(error);
+  }
 
-    //const nameExists = persons.some(person => person.name === body.name);
-    //if (nameExists) {
-    //  return response.status(400).json({ error: 'name must be unique' });
-    //}
+  if (!body.number || body.number.trim() === '') {
+    const error = new Error('number missing');
+    error.status = 400;
+    return next(error);
+  }
+
+  //const nameExists = persons.some(person => person.name === body.name);
+  //if (nameExists) {
+  //  return response.status(400).json({ error: 'name must be unique' });
+  //}
   
-    const person = new Person({
-        name: body.name,
-        number: body.number,
-      })
-    
-      person.save().then(savedPerson => {
-        response.json(savedPerson)
-      })
+  const person = new Person({
+      name: body.name,
+      number: body.number,
+    })
+  
+    person.save().then(savedPerson => {
+      response.json(savedPerson)
+    })
+    .catch(error => next(error));
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
@@ -104,6 +114,10 @@ const errorHandler = (error, request, response, next) => {
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
   } 
+
+  if (error.status) {
+    return response.status(error.status).json({ error: error.message });
+  }
 
   next(error)
 }
