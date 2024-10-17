@@ -7,27 +7,27 @@ const url = process.env.MONGODB_URI
 console.log('connecting to', url)
 
 mongoose.connect(url)
-  .then(result => {
+  .then(() => {
     console.log('connected to MongoDB')
   })
   .catch(error => {
     console.log('error connecting to MongoDB:', error.message)
   })
 
-  const phoneValidator = [
-    {
-      validator: function (v) {
-        return /\d{2,3}-\d{5,}/.test(v);
-      },
-      message: props => `${props.value} is not a valid phone number!`
+const phoneValidator = [
+  {
+    validator: function (v) {
+      return /\d{2,3}-\d{5,}/.test(v)
     },
-    {
-      validator: function (v) {
-        return v.length >= 8;
-      },
-      message: props => `${props.value} is too short!`
-    }
-  ];
+    message: props => `${props.value} is not a valid phone number!`
+  },
+  {
+    validator: function (v) {
+      return v.length >= 8
+    },
+    message: props => `${props.value} is too short!`
+  }
+]
 
 const personSchema = new mongoose.Schema({
   name: {
