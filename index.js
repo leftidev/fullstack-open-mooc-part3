@@ -121,9 +121,8 @@ const errorHandler = (error, request, response, next) => {
     return response.status(400).send({ error: 'malformatted id' })
   } 
 
-  // FIX this validation error to give more detailed message for frontend!
   if (error.name === 'ValidationError') {
-    return response.status(400).send({ error: error.response.data });
+    return response.status(400).json({ error: error.message });
   }
 
   if (error.status) {
